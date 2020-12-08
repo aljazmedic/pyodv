@@ -1,0 +1,9 @@
+temp/
+
+*.tex
+*.pdf
+*.log
+*.fls
+__pycache__/
+*.aux
+*.fdb_latexmk

@@ -1,0 +1,43 @@
+
+	# Ekv
+	#	Xor -> ?
+	#		"\Leftrightarrow" -> Ekv
+
+	# Xor
+	#	Impl -> ?
+	#			"\oplus" -> Xor
+
+	# Impl
+	#	Ali -> ?
+	#			"\implies" -> Impl
+
+	# Ali
+	#	Pier -> ?
+	#			"\lor" -> Ali
+
+	# Pier
+	#	Scheff -> ?
+	#			"\downarrow" -> Pier
+	
+	# Scheff
+	#	In -> ?
+	#			"\uparrow" -> Scheff
+
+	# In
+	#	Clen -> ?
+	#			"\land" -> Clen ->
+	# 			Clen ->
+
+	# Clen
+	#	"\overline" -> Clen ->
+	#	"{" -> Ekv -> "}" ->
+	#	Spremenljivka ->
+
+	# Spremenljivka:
+	#	"x_" -> Oznaka->
+	#	1 ->
+	#	0 ->
+	
+	# Oznaka
+	#  {[a-zA-Z0-9]+}
+	# [a-zA-Z0-9]
