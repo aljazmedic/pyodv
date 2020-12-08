@@ -3,6 +3,7 @@ from abc import abstractmethod, ABC
 from funkcija import Funkcija
 from typing import List, Union, Optional
 from util import fixed
+from pylatex.utils import NoEscape
 import inspect
 
 class Veznik:
@@ -299,7 +300,7 @@ def from_latex(tekst:str, **fn_init_args)->Funkcija:
 		for v in resitve: 
 			print(v.zap(order), v.vrednost)
 		biti_ = ''.join([str(v.vrednost) for v in resitve])
-		fn_init_args.update({"spremenljivke":[sv.name for sv in order]})
+		fn_init_args.update({"spremenljivke":[NoEscape(sv.name) for sv in order]})
 		return Funkcija(biti_, **fn_init_args)
 
 if __name__ == "__main__":
