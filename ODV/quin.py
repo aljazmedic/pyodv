@@ -95,6 +95,17 @@ def _odstrani_nepotrebne(vsebovalniki, termi):
 	#return vsebovalniki.keys()
 
 def quin(self:Funkcija) -> Tuple[List[str],NoEscape]:
+	if self.st_spremenljivk == 0:
+		if self.pravilni_biti == "1":		#MDNO,  MKNO
+			mdno_tex = NoEscape(self.tex(fn_index='MDNO')+"=1")
+			mkno_tex = NoEscape(self.tex(fn_index='MKNO')+"=None")
+			ret_tex = NoEscape(self.tex(fn_index='MNO')+"="+mdno_tex)
+		elif self.pravilni_biti == "0":		#MDNO,  MKNO
+			mdno_tex = NoEscape(self.tex(fn_index='MDNO')+"=None")
+			mkno_tex = NoEscape(self.tex(fn_index='MKNO')+"=0")
+			ret_tex = NoEscape(self.tex(fn_index='MNO')+"=None"+mkno_tex)
+			
+		return ret_tex, [], (0,0), (mdno_tex,mkno_tex)
 	print(self.mintermi)
 	
 	levels_maks = _poisci_vsebovalnike(self.st_spremenljivk, self.makstermi)

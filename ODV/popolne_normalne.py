@@ -26,7 +26,7 @@ def PKNO(self:Funkcija,vrni_ceno=False)->NoEscape:
         using=('','\lor'),
         vrni_ceno=True,
         wrap_inner=True)
-    pkno_tex = NoEscape(self.tex(fn_index=NoEscape(FootnoteText("PKNO")))+"="+pkno_tex)
+    pkno_tex = NoEscape(self.tex(fn_index="PKNO")+"="+pkno_tex)
     if vrni_ceno:
         return pkno_tex, cena
     return pkno_tex

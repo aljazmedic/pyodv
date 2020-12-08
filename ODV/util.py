@@ -2,10 +2,27 @@ import numpy as np
 from typing import List,Tuple,Optional
 from pylatex import Math
 from pylatex.utils import NoEscape
+from contextlib import contextmanager 
 
 ali = lambda x,y:f"{x} \lor {y}"
 ter = lambda x,y:f"{x} \land {y}" # in polomy kačo
 neg = lambda x:f" \overline{{{x}}}"
+
+
+def dumps(s):
+	# dump strig
+	print(f"'{s}'", ":".join("{:02x}".format(ord(c)) for c in s))
+
+@contextmanager
+def fixed(*vars_to_save):
+	_saved = [var.copy() for var in vars_to_save]
+	try:
+		if len(_saved) == 1:
+			yield _saved[0]
+		else:
+			yield _saved
+	finally:
+		pass
 
 def minterm_v_niz(m,n=None):
 	if n is None:

@@ -9,8 +9,7 @@ import re
 class Funkcija:
 	# pravilne bite
 	# minterme
-	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None,n=0,name="f"):
-		self.name=name
+	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None,n=0,spremenljivke=None,name="f"):
 		mtn = mintermi is not None
 		pbn = pravilni_biti is not None
 		if not mtn^pbn:
@@ -42,7 +41,16 @@ class Funkcija:
 			self.makstermi=[]
 			for i, e in enumerate(self.pravilni_biti):
 				if e == "0":
-					self.makstermi.append(2**self.st_spremenljivk-i-1)	
+					self.makstermi.append(2**self.st_spremenljivk-i-1)
+		
+		##Imena, spremenljivke
+		self.name=name
+		x = lambda n: NoEscape(f"x_{n}")
+		if not spremenljivke:
+			self.imena_spr = [x(i+1) for i in range(n)]
+		else:
+			self.imena_spr = spremenljivke[:self.st_spremenljivk]
+		
 
 
 	def __str__(self):
@@ -55,7 +63,7 @@ class Funkcija:
 		return self.pravilni_biti == value.pravilni_biti# all([x==y for x, y in zip(self.mintermi, value.mintermi)])
 	
 	def tex(self, fn_index=None)-> NoEscape: 
-		inputs = ','.join([f"x_{n}" for n in range(1, self.st_spremenljivk+1,1)])
+		inputs = ','.join(self.imena_spr)
 		#print(inputs)
 		if fn_index is not None:
 			fn_index="_{"+fn_index+"}"
