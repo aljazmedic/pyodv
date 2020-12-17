@@ -7,3 +7,5 @@ temp/
 __pycache__/
 *.aux
 *.fdb_latexmk
+
+venv/

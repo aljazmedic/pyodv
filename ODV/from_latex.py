@@ -297,8 +297,6 @@ def from_latex(tekst:str, **fn_init_args)->Funkcija:
 		order = list(SPREMENLJIVKA.vars)
 		order.sort(key=lambda x:x.name)
 		resitve = eval_postfix(POST_FIX)
-		for v in resitve: 
-			print(v.zap(order), v.vrednost)
 		biti_ = ''.join([str(v.vrednost) for v in resitve])
 		fn_init_args.update({"spremenljivke":[NoEscape(sv.name) for sv in order]})
 		return Funkcija(biti_, **fn_init_args)
