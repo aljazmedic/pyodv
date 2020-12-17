@@ -12,7 +12,7 @@ Paket za interakcijo s pravilnistnimi funkcijami, napisan v pythonu. Omogoča za
 
   ```bash
   python -m pip install --update pip
-  python -m pip install requirements.txt
+  python -m pip install -r requirements.txt
   ```
 ### Uporaba
 ```python
