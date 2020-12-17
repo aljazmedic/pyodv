@@ -25,3 +25,7 @@ f = Funkcija(mintermi=[1,2])
 f = from_latex("\overline{x_1} \land \overline{x_2})")
 #funkcija dveh spremenljivk, vrednosti "1110"
 ```
+
+### Uporaba v interpreterju
+
+Pričnemo z ukazom `python -i ODV`, s čimer označimo interaktivni način, kjer bomo lahko uporabljali vse razrede in funkcije modula. (Tudi `IPython -i ODV`)
