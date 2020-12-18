@@ -36,8 +36,9 @@ class Funkcija:
 		if mtn + pbn + mkstn != 1:
 			raise Exception("Nepravilna uporaba konstruktorja!")
 		elif pbn:
-			self.pravilni_biti = pravilni_biti
-			self.st_spremenljivk = max(np.log2(len(pravilni_biti)).astype(np.int32),n)
+			self.st_spremenljivk = max(np.log2(len(pravilni_biti)).astype(np.int32)+1,n)
+			self.n = self.st_spremenljivk
+			self.pravilni_biti = ("{:0>%s}"%(2**self.n)).format(pravilni_biti)
 			if self.st_spremenljivk%1 != 0:
 				raise Exception(f"Nepravilno stevilo bitov: {len(pravilni_biti)}")
 
