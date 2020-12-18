@@ -22,13 +22,13 @@ class Funkcija:
 			Makstermi funkcije, ekskluziven z mintermi in pravilnimi_biti
 		
 		n : int (Opcijsko)
-			število vhodnih spremenljivk, dobljeno iz prvih argumentov
+			Stevilo vhodnih spremenljivk, dobljeno iz prvih argumentov
 
-		spremenljivke : iter[str] (Opcijsko)
-			imena spremenljivk funkcije
+		spremenljivke : iter[str] (Opcijsko) [x_1, x_2, ...]
+			Imena spremenljivk funkcije
 		
-		name : str (Opcijsko)
-			ime funkcije
+		name : str (Opcijsko) [f]
+			Ime funkcije
 		"""
 		mtn = mintermi is not None
 		pbn = pravilni_biti is not None

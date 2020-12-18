@@ -23,6 +23,36 @@ sudo apt-get install texlive-pictures texlive-science texlive-latex-extra latexm
   python -m pip install -r requirements.txt
   ```
 ### Uporaba
+
+### `Funkcija(pravilni_biti, mintermi, makstermi, n=0, spremenljivke=None, name='f')`
+ |      Paramteri:
+ |      ----------
+ |      pravilni_biti : **str**  Pravilni biti funkcije, ekskluziven z `makstermi` in `mintermi`
+ |      mintermi : **list[int]** Mintermi funkcije, ekskluziven z `makstermi` in `pravilnimi_biti`
+ |      makstermi : **list[int]** Makstermi funkcije, ekskluziven z `mintermi` in `pravilnimi_biti`
+ |      n : **int** (Opcijsko) Stevilo vhodnih spremenljivk, dobljeno iz prvih argumentov
+ |      spremenljivke : **iter[str]** (Opcijsko *[x_1, x_2, ...]*)  Imena spremenljivk funkcije
+ |      name : **str** (Opcijsko *[f]*) Ime funkcije
+ | 
+
+|      Metode:
+ |      -----------
+ | `sort(order=None)` Vrne kopijo funkcije z drugačnim vrstnim redom spremenljivk
+ | `table(order=None)` Izpiše pravilnostno tabelo v terminal
+ | 
+
+
+
+### `SimFunkcija(n, sim_stevila, neg=[], **kwargs)`
+
+|      Paramteri:
+ |      ----------
+ |      n : **int** Stevilo vhodnih spremenljivk
+ |      sim_stevila : **list[int]** Simterijska Stevila funkcije
+ |      neg : **list[int]** (Opcijsko []) 0-based npr. [0] => ~x1 x2
+ |      \*\*kwargs : **dict**  argumenti za razred Funkcija
+ | 
+
 ```python
 f = Funkcija("10010101")
 # funkcija treh spremenljivk

@@ -11,7 +11,7 @@ class SimFunkcija(Funkcija):
 		Paramteri:
 		----------
 		n : int
-			število vhodnih spremenljivk
+			Stevilo vhodnih spremenljivk
 
 		sim_stevila : list[int]
 			Simterijska števila funkcije
@@ -19,8 +19,8 @@ class SimFunkcija(Funkcija):
 		neg : list[int]
 			0-osnovni seznam negacij npr. [0] => ~x1 x2
 
-		kwargs : dict
-			argumenti za razred Funkcija
+		**kwargs : dict
+			Argumenti za razred Funkcija
 		"""
 		if neg is None:neg="1"*n
 		if isinstance(neg, str):
