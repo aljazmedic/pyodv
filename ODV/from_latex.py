@@ -54,7 +54,7 @@ splitter_re = [
 ]
 SPLITTER_RE = "((?:" + ")|(?:".join(splitter_re) + "))\\s?"
 TOKEN_RE= re.compile(SPLITTER_RE)
-
+#print(SPLITTER_RE)
 def get_tokens(tekst:str) -> List[str]:
 	m = re.match("("+SPLITTER_RE+")+", tekst)
 	if m:

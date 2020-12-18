@@ -9,6 +9,27 @@ class Funkcija:
 	# pravilne bite
 	# minterme
 	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None, makstermi:List[int]=None, n=0,spremenljivke=None,name="f"):
+		"""
+		Paramteri:
+		----------
+		pravilni_biti : str
+			Pravilni biti funkcije, ekskluziven z makstermi in mintermi
+
+		mintermi : list[int]
+			Mintermi funkcije, ekskluziven z makstermi in pravilnimi_biti
+		
+		makstermi : list[int]
+			Makstermi funkcije, ekskluziven z mintermi in pravilnimi_biti
+		
+		n : int (Opcijsko)
+			število vhodnih spremenljivk, dobljeno iz prvih argumentov
+
+		spremenljivke : iter[str] (Opcijsko)
+			imena spremenljivk funkcije
+		
+		name : str (Opcijsko)
+			ime funkcije
+		"""
 		mtn = mintermi is not None
 		pbn = pravilni_biti is not None
 		mkstn = makstermi is not None
@@ -137,6 +158,17 @@ class Funkcija:
 			)
 		return Funkcija(pb,spremenljivke=o,n=self.n)
 
+	def table(self,order=None):
+		if order is not None:
+			return self.sort(order).table()
+		
+		widths = [len(n) for n in self.imena_spr]
+		headers = ' '.join(self.imena_spr)
+		print(headers,self.name,sep=" | ")
+		for mtrm, vr in enumerate(self.pravilni_biti):
+			niz = minterm_v_niz(mtrm,n=self.n)
+			print(" ".join([("{: >%s}"%w).format(b) for w, b in zip(widths, niz)]),vr,sep=" | ")
+			
 def fn_for(poi):
 	_poi = poi.copy()
 	def fn(biti, skupni_term_in):
@@ -153,7 +185,7 @@ def get_overlapping_inputs(*functions:List[Funkcija], inputs=None):
 	else:
 		for f in functions:
 			if any([ime not in inputs for ime in f.imena_spr]):
-				raise Exception("Missing some of the names "+f.imena_spr)
+				raise Exception("Missing some of the names "+str(f.imena_spr))
 		o = inputs
 	consec_fn = []
 	for f in functions:
@@ -168,5 +200,6 @@ if __name__ == '__main__':
 	print(f1)
 	print(f2)
 	print(f1&f2)
+	f1.table()
 	print(-f2.sort())
 

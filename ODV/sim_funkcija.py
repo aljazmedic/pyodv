@@ -7,6 +7,21 @@ from util import minterm_v_niz
 
 class SimFunkcija(Funkcija):
 	def __init__(self, n:int, sim_stevila:List[int], neg:Optional[List[int]]=None, **kwargs):
+		"""
+		Paramteri:
+		----------
+		n : int
+			število vhodnih spremenljivk
+
+		sim_stevila : list[int]
+			Simterijska števila funkcije
+		
+		neg : list[int]
+			0-osnovni seznam negacij npr. [0] => ~x1 x2
+
+		kwargs : dict
+			argumenti za razred Funkcija
+		"""
 		if neg is None:neg="1"*n
 		if isinstance(neg, str):
 			neg_s = neg

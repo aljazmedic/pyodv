@@ -8,6 +8,14 @@ Paket za interakcijo s pravilnistnimi funkcijami, napisan v pythonu. Omogoča za
   source venv/Scripts/activate
   ```
 
+### Pretvornik iz LaTeX v pdf:
+#### Windows
+Potrebno je namestiti texlive ali pa MikTex 
+#### Linux
+```bash
+sudo apt-get install texlive-pictures texlive-science texlive-latex-extra latexmk
+```
+
 - Potrebno je namestiti knjižnice, ki se nahajajo v datoteki `requirements.txt`. To naredimo z ukazom
 
   ```bash
