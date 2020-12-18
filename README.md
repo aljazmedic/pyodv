@@ -1,5 +1,5 @@
 # pyodv
-Paket za interakcijo s pravilnistnimi funkcijami, napisan v pythonu. Omogoča zapis ali pa zajetje funkcije iz LaTeX-a, prikaz pravilnistne tabele in minimizacije s Quinovo metodo.
+Paket za interakcijo s pravilnostnimi funkcijami, napisan v pythonu. Omogoča zapis ali pa zajetje funkcije iz LaTeX-a, prikaz pravilnostne tabele in minimizacije s Quinovo metodo.
 
 ### Namestitev
 - (Opcijsko) Ustvarimo virtualno okolje za projekt in ga aktiviramo
