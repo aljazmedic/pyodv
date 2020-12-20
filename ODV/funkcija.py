@@ -35,8 +35,14 @@ class Funkcija:
 		mkstn = makstermi is not None
 		if mtn + pbn + mkstn != 1:
 			raise Exception("Nepravilna uporaba konstruktorja!")
-		elif pbn:
-			self.st_spremenljivk = max(np.log2(len(pravilni_biti)).astype(np.int32)+1,n)
+		
+		if spremenljivke is None:
+			spremenljivke = []
+		if pbn:
+			self.st_spremenljivk = max(
+				np.ceil(np.log2(len(pravilni_biti))).astype(np.int32),
+				n,
+				len(spremenljivke))
 			self.n = self.st_spremenljivk
 			self.pravilni_biti = ("{:0>%s}"%(2**self.n)).format(pravilni_biti)
 			if self.st_spremenljivk%1 != 0:
@@ -54,7 +60,10 @@ class Funkcija:
 		elif mkstn:
 			self.makstermi = makstermi
 			max_term = max(makstermi)+1
-			self.st_spremenljivk = max(np.ceil(np.log2(max_term)).astype(np.int32), n)
+			self.st_spremenljivk = max(
+				np.ceil(np.log2(max_term)).astype(np.int32),
+				n,
+				len(spremenljivke))
 			self.pravilni_biti = ["1"]*(2**self.st_spremenljivk)
 			for mtm in self.makstermi:
 				self.pravilni_biti[2**self.st_spremenljivk-mtm-1] = "0"
@@ -66,7 +75,10 @@ class Funkcija:
 		elif mtn:
 			self.mintermi = mintermi
 			max_term = max(mintermi)+1
-			self.st_spremenljivk = max(np.ceil(np.log2(max_term)).astype(np.int32), n)
+			self.st_spremenljivk = max(
+				np.ceil(np.log2(max_term)).astype(np.int32),
+				n,
+				len(spremenljivke))
 			self.pravilni_biti = ["0"]*(2**self.st_spremenljivk)
 			for mtm in self.mintermi:
 				self.pravilni_biti[mtm] = "1"
@@ -84,7 +96,7 @@ class Funkcija:
 		else:
 			self.imena_spr =[]
 			for s in spremenljivke[:self.n]:
-				 self.imena_spr.append(s if isinstance(s, NoEscape) else NoEscape(s))
+				self.imena_spr.append(s if isinstance(s, NoEscape) else NoEscape(s))
 
 
 	def __str__(self):
@@ -104,14 +116,16 @@ class Funkcija:
 		elif type(other) != Funkcija:
 			raise Exception("Not a Function: "+ str(other))
 		spr, (spr_f1, spr_f2) = get_overlapping_inputs(self,other)
+		#print("Union spr", spr)
 		p_biti = ""
 		new_fn_n = len(spr)
 		for trm in range(2**(new_fn_n)):
 			mtm = minterm_v_niz(trm,n=new_fn_n)
 			b_f1 = int(spr_f1(self.pravilni_biti,mtm))
 			b_f2 = int(spr_f2(other.pravilni_biti,mtm))
-			p_biti+= "1" if (b_f1 | b_f2) else "0"
-		return Funkcija(p_biti,spremenljivke=spr,n=new_fn_n)
+			p_biti+= "1" if (b_f1==1 or b_f2==1) else "0"
+		#print(p_biti)
+		return Funkcija(p_biti,spremenljivke=spr)
 
 	def __add__(self,other):
 		return self.__or__(other)
@@ -124,14 +138,16 @@ class Funkcija:
 		elif type(other) != Funkcija:
 			raise Exception("Not a Function: "+ str(other))
 		spr, (spr_f1, spr_f2) = get_overlapping_inputs(self,other)
+		#print("Union spr", spr)
 		p_biti = ""
 		new_fn_n = len(spr)
 		for trm in range(2**(new_fn_n)):
 			mtm = minterm_v_niz(trm,n=new_fn_n)
-			b_f1 = int(spr_f1(self.pravilni_biti,mtm))
-			b_f2 = int(spr_f2(other.pravilni_biti,mtm))
-			p_biti+= "1" if (b_f1 & b_f2) else "0"
-		return Funkcija(p_biti,spremenljivke=spr,n=new_fn_n)
+			b_f1 = int(spr_f1(self.pravilni_biti, mtm))
+			b_f2 = int(spr_f2(other.pravilni_biti, mtm))
+			p_biti+= "1" if (b_f1==1 and b_f2==1) else "0"
+		#print(p_biti)
+		return Funkcija(p_biti,spremenljivke=spr)
 
 	def __mul__(self, other):
 		return self.__and__(other)
@@ -163,27 +179,32 @@ class Funkcija:
 		if order is not None:
 			return self.sort(order).table()
 		
-		widths = [len(n) for n in self.imena_spr]
-		headers = ' '.join(self.imena_spr)
+		w = max([len(n) for n in self.imena_spr])
+		headers = ' '.join([("{: <%s}"%w).format(b) for b in self.imena_spr])
 		print(headers,self.name,sep=" | ")
 		for mtrm, vr in enumerate(self.pravilni_biti):
 			niz = minterm_v_niz(mtrm,n=self.n)
-			print(" ".join([("{: >%s}"%w).format(b) for w, b in zip(widths, niz)]),vr,sep=" | ")
+			print(" ".join([("{: >%s}"%w).format(b) for b in niz]),vr,sep=" | ")
 			
 def fn_for(poi):
 	_poi = poi.copy()
 	def fn(biti, skupni_term_in):
+		#print(_poi)
 		v_tej_f = int(''.join([skupni_term_in[i] for i in _poi]),2)
 		return biti[v_tej_f]
 	return fn
 
 def get_overlapping_inputs(*functions:List[Funkcija], inputs=None):
-	if inputs ==None:
+	if inputs is None:
 		inputs = set()
 		for f in functions:
 			[inputs.add(ime) for ime in f.imena_spr]
 		o = list(sorted(inputs))
 	else:
+		_inp = []
+		for s in inputs:
+			_inp.append(s if isinstance(s, NoEscape) else NoEscape(s))
+		inputs = _inp
 		for f in functions:
 			if any([ime not in inputs for ime in f.imena_spr]):
 				raise Exception("Missing some of the names "+str(f.imena_spr))
@@ -196,11 +217,4 @@ def get_overlapping_inputs(*functions:List[Funkcija], inputs=None):
 
 
 if __name__ == '__main__':
-	f1 = Funkcija("0111")
-	f2 = Funkcija("0010",spremenljivke=[NoEscape("x_2"),NoEscape("x_3"), ])
-	print(f1)
-	print(f2)
-	print(f1&f2)
-	f1.table()
-	print(-f2.sort())
-
+	pass
