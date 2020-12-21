@@ -1,23 +1,22 @@
-import numpy as np
-from typing import List
-from util import minterm_v_niz
-from funkcija import Funkcija
-from pylatex import Document, Section, Subsection, Math
+from ..util import minterm_v_niz
+from ..function import Funkcija
 from pylatex.utils import NoEscape
 from pprint import PrettyPrinter
 from collections import defaultdict
 
+from typing import List
+
 pp = PrettyPrinter(indent=4)
 def _loci_po(self:Funkcija, zap:int):
     ret = defaultdict(str)
-    lx = ["X"]*self.st_spremenljivk
+    lx = ["X"]*self.n
     lx[zap] = "%s"
     L_X = "".join(lx)
     def izp(n):
         return L_X%n
 
     for i, vred in enumerate(self.pravilni_biti):
-        zap_bitov = list(minterm_v_niz(i,self.st_spremenljivk))
+        zap_bitov = list(minterm_v_niz(i,self.n))
         izp_bit = zap_bitov.pop(zap)
         ret[izp(izp_bit)]+=vred
         #ret.append((''.join([ta_vr]+l),vred))
@@ -25,7 +24,7 @@ def _loci_po(self:Funkcija, zap:int):
     return dict(ret)
 
 def locitev(self:Funkcija):
-    for i in range(self.st_spremenljivk):
+    for i in range(self.n):
         _loci_po(self,i)
 
 if __name__ == "__main__":

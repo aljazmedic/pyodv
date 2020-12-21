@@ -1,14 +1,14 @@
-from funkcija import Funkcija
+from . import Funkcija
+from ..util import minterm_v_niz, provide_no_escape
 from typing import List, Optional
 from pylatex import Document, Section, Subsection, Math
-from pylatex.utils import NoEscape, escape_latex
+from pylatex.utils import NoEscape
 from itertools import zip_longest
-from util import minterm_v_niz
 
 class SimFunkcija(Funkcija):
 	def __init__(self, n:int, sim_stevila:List[int], neg:Optional[List[int]]=None, **kwargs):
 		"""
-		Paramteri:
+		Parameters
 		----------
 		n : int
 			Stevilo vhodnih spremenljivk
@@ -61,7 +61,8 @@ class SimFunkcija(Funkcija):
 		return f"f{sim_simb}({inputs}): {self.pravilni_biti}"
 		
 	def tex(self)-> Math: 
-		sim_simb = escape_latex('{'+','.join(map(str,self.sim_stevila))+'}')
+		provide_no_escape(*self.sim_stevila)
+		sim_simb = NoEscape('{'+','.join(provide_no_escape(*self.sim_stevila))+'}')
 		return super().tex(sim_simb)
 
 

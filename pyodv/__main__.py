@@ -1,16 +1,8 @@
-from funkcija import Funkcija
-from util import minterm_v_niz
-from tabela import tabela
-from from_latex import from_latex
-from sim_funkcija import SimFunkcija
-from quin import quin
-from popolne_normalne import PDNO, PKNO
-# begin-doc-include
-from pylatex import Document, Section, Subsection, Command, Math, Tabular
-from pylatex.basic import NewLine, LineBreak
-from pylatex.utils import italic, NoEscape
+#from . import Funkcija, SimFunkcija, from_latex, quin, tabela,  pdno, pkno
 
-
+from pyodv.function import Funkcija,SimFunkcija
+from pyodv.latex import pdno, pkno, tabela
+#from pyodv.function.funkcija import Funkcija
 if __name__ == '__main__':
 	# f2 = Funkcija(mintermi=[0,1,2,3,6,7,8,10,11,13,14,15],n=4)
 	# f2 = Funkcija("11001010")

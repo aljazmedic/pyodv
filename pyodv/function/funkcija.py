@@ -1,34 +1,81 @@
 import numpy as np
-from typing import List
-from util import minterm_v_niz, provide_no_escape
-from pylatex import Document, Section, Subsection, Math
+from ..util import minterm_v_niz, provide_no_escape
 from pylatex.utils import NoEscape
-import re
+
+from typing import List, Optional, Union
+
 
 class Funkcija:
-	# pravilne bite
-	# minterme
+	"""
+	Attributes
+	----------
+	pravilni_biti : str
+		Niz pravilnih bitov po pravilnostni tabeli
+	
+	mintermi : list of int
+		Mintermi funkcije
+	
+	makstermi : list of int
+		Makstermi funkcije
+	
+	n : int
+		Stevilo vhodnih spremenljivk funkcije
+	
+	imena_spr : list of NoEscape
+		Imena vhodnih spremenljivk
+	
+	name : NoEscape
+		Ime funkcije
+
+	Examples
+	--------
+	>>> f1 = Funkcija("0111")
+	>>> print(f1.table())
+	x_1 x_2 | f
+	  0   0 | 0
+	  0   1 | 1
+	  1   0 | 1
+	  1   1 | 1
+
+	>>> f2 = Funkcija(mintermi=[3])
+	>>> print(f2.table())
+	x_1 x_2 | f
+	  0   0 | 0
+	  0   1 | 0
+	  1   0 | 0
+	  1   1 | 1
+
+	>>> f3 = f & ~f2
+	>>> print(f3.table())
+	x_1 x_2 | f
+	  0   0 | 0
+	  0   1 | 1
+	  1   0 | 1
+	  1   1 | 0
+	"""
+
 	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None, makstermi:List[int]=None, n=0,spremenljivke=None,name="f"):
 		"""
-		Paramteri:
+		Parameters
 		----------
 		pravilni_biti : str
 			Pravilni biti funkcije, ekskluziven z makstermi in mintermi
 
-		mintermi : list[int]
+		mintermi : list of int
 			Mintermi funkcije, ekskluziven z makstermi in pravilnimi_biti
 		
-		makstermi : list[int]
+		makstermi : list of int
 			Makstermi funkcije, ekskluziven z mintermi in pravilnimi_biti
 		
-		n : int (Opcijsko)
+		n : int, optional
 			Stevilo vhodnih spremenljivk, dobljeno iz prvih argumentov
 
-		spremenljivke : iter[str] (Opcijsko) [x_1, x_2, ...]
-			Imena spremenljivk funkcije
+		spremenljivke : iterable object, optional
+			Imena spremenljivk funkcije. Privzeto:  [x_1, x_2, ...]
 		
-		name : str (Opcijsko) [f]
-			Ime funkcije
+		name : str, optional
+			Ime funkcije. Privzeto "f"
+		
 		"""
 		mtn = mintermi is not None
 		pbn = pravilni_biti is not None
@@ -39,13 +86,13 @@ class Funkcija:
 		if spremenljivke is None:
 			spremenljivke = []
 		if pbn:
-			self.st_spremenljivk = max(
+			self.n = max(
 				np.ceil(np.log2(len(pravilni_biti))).astype(np.int32),
 				n,
 				len(spremenljivke))
-			self.n = self.st_spremenljivk
+
 			self.pravilni_biti = ("{:0>%s}"%(2**self.n)).format(pravilni_biti)
-			if self.st_spremenljivk%1 != 0:
+			if self.n%1 != 0:
 				raise Exception(f"Nepravilno stevilo bitov: {len(pravilni_biti)}")
 
 			self.mintermi=[]
@@ -54,19 +101,19 @@ class Funkcija:
 				if e == "1":
 					self.mintermi.append(i)
 				elif e == "0":
-					self.makstermi.append(2**self.st_spremenljivk - i-1)
+					self.makstermi.append(2**self.n - i-1)
 				else:
 					raise Exception(f"Nepravilno zap. bitov: {mintermi}")
 		elif mkstn:
 			self.makstermi = makstermi
 			max_term = max(makstermi)+1
-			self.st_spremenljivk = max(
+			self.n = max(
 				np.ceil(np.log2(max_term)).astype(np.int32),
 				n,
 				len(spremenljivke))
-			self.pravilni_biti = ["1"]*(2**self.st_spremenljivk)
+			self.pravilni_biti = ["1"]*(2**self.n)
 			for mtm in self.makstermi:
-				self.pravilni_biti[2**self.st_spremenljivk-mtm-1] = "0"
+				self.pravilni_biti[2**self.n-mtm-1] = "0"
 			self.pravilni_biti = "".join(self.pravilni_biti)
 			self.mintermi=[]
 			for i, e in enumerate(self.pravilni_biti):
@@ -75,20 +122,19 @@ class Funkcija:
 		elif mtn:
 			self.mintermi = mintermi
 			max_term = max(mintermi)+1
-			self.st_spremenljivk = max(
+			self.n = max(
 				np.ceil(np.log2(max_term)).astype(np.int32),
 				n,
 				len(spremenljivke))
-			self.pravilni_biti = ["0"]*(2**self.st_spremenljivk)
+			self.pravilni_biti = ["0"]*(2**self.n)
 			for mtm in self.mintermi:
 				self.pravilni_biti[mtm] = "1"
 			self.pravilni_biti = "".join(self.pravilni_biti)
 			self.makstermi=[]
 			for i, e in enumerate(self.pravilni_biti):
 				if e == "0":
-					self.makstermi.append(2**self.st_spremenljivk-i-1)
-		self.n = self.st_spremenljivk
-		##Imena, spremenljivke
+					self.makstermi.append(2**self.n-i-1)
+				##Imena, spremenljivke
 		self.name=name
 		x = lambda n: NoEscape(f"x_{n}")
 		if not spremenljivke:
@@ -157,6 +203,15 @@ class Funkcija:
 		return self.__invert__()	
 
 	def tex(self, fn_index=None)-> NoEscape: 
+		"""
+		Vrne notacijo funkcije v odvisnosti od spremenljivk
+
+		Parameters
+		----------
+		sub_index: str, optional
+			Opcijski podpis funkciji
+
+		"""
 		inputs = ','.join(self.imena_spr)
 		#print(inputs)
 		if fn_index is not None:
@@ -166,24 +221,66 @@ class Funkcija:
 		return NoEscape(self.name+fn_index+NoEscape(f"({inputs})"))
 	
 	def sort(self,order=None):
+		"""
+		Vrne kopijo funkcije z danim oz. urejenim vrstnim redom
 
+		Parameters
+		----------
+		order: list of str, optional
+			Zaporedje vhodnih spremenljivk, ki prepiše sortiranje po abecedi
+
+		"""
 		o, (fn,) = get_overlapping_inputs(self,inputs=order)
 		pb = ''.join(
 			[fn(self.pravilni_biti, minterm_v_niz(i,n=self.n)) for i in range(2**self.n) ]
 			)
 		return Funkcija(pb,spremenljivke=o,n=self.n)
 
-	def table(self,order=None):
+	def table(self,order:Optional[List[str]]=None) -> str:
+		"""
+		Vrne niz, ki predstavlja pravilnostno tabelo funkcije
+
+		Parameters
+		----------
+		order: list of str, optional
+			Zaporedje vhodnih spremenljivk, ki prepiše sortiranje po abecedi
+
+		"""
 		if order is not None:
 			return self.sort(order).table()
-		
+		r = []
 		w = max([len(n) for n in self.imena_spr])
 		headers = ' '.join([("{: <%s}"%w).format(b) for b in self.imena_spr])
-		print(headers,self.name,sep=" | ")
+		r.append(" | ".join([headers,self.name]))
 		for mtrm, vr in enumerate(self.pravilni_biti):
 			niz = minterm_v_niz(mtrm,n=self.n)
-			print(" ".join([("{: >%s}"%w).format(b) for b in niz]),vr,sep=" | ")
-			
+			r.append(
+				" | ".join(
+					[" ".join([("{: >%s}"%w).format(b) for b in niz]),vr]
+					))
+		r = "\n".join(r)
+		return r
+
+	@classmethod
+	def table_all(cls, *functions, sort=None):
+		spr, fns = get_overlapping_inputs(*functions, inputs=sort)
+		n_all_inp = len(spr)
+		names = [f.name for f in functions]
+		r = []
+		w = max([len(n) for n in spr])
+		headers = ' '.join([("{: <%s}"%w).format(b) for b in spr])
+		r.append(" | ".join([headers,*names]))
+		for mtrm in range(2**n_all_inp):
+			niz = minterm_v_niz(mtrm,n=n_all_inp)
+			r.append(
+				" | ".join(
+					[" ".join([("{: >%s}"%w).format(b) for b in niz]),
+					*[str(fn_f(f.pravilni_biti, niz)) for fn_f, f in zip(fns, functions)]
+					]
+					))
+		r = "\n".join(r)
+		return r
+
 def fn_for(poi):
 	_poi = poi.copy()
 	def fn(biti, skupni_term_in):
@@ -201,7 +298,8 @@ def get_overlapping_inputs(*functions:List[Funkcija], inputs=None):
 	else:
 		if not isinstance(inputs, (list,tuple,set)):
 			raise Exception("Invalid inputs:" + str(inputs))
-		inputs = provide_no_escape(inputs)
+		inputs = provide_no_escape(*inputs)
+		print(inputs)
 		for f in functions:
 			if any([ime not in inputs for ime in f.imena_spr]):
 				raise Exception("Missing some of the names "+str(f.imena_spr))

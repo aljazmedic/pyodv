@@ -1,12 +1,22 @@
-import re
-from abc import abstractmethod, ABC
-from funkcija import Funkcija
+from .funkcija import Funkcija
 from typing import List, Union, Optional
-from util import fixed
+import re
+from pyodv.util import fixed
+from abc import ABC, abstractmethod
 from pylatex.utils import NoEscape
 import inspect
 
+from typing import List, Union, Optional
+
+#print(SPLITTER_RE)
+def get_tokens(tekst:str) -> List[str]:
+	m = re.match("("+SPLITTER_RE+")+", tekst)
+	if m:
+		return re.findall(TOKEN_RE,tekst)
+	return []
+
 class Veznik:
+
 	def __init__(self, ime:str, fn:callable, **kwargs):
 		self.ime = ime
 		self.fn = fn
@@ -28,39 +38,6 @@ class Veznik:
 	def __str__(self):
 		return self.ime
 
-
-### Tokenizing 
-
-V_ne = Veznik("NE", lambda x:1 if x == 0 else 0,latex="\\overline",logisim="~")
-V_ter = Veznik("IN",lambda x,y:x&y,latex="\\land",logisim="*")
-V_scheff = Veznik("SCHEFF", lambda x,y:V_ne.izracunaj(x&y), latex="\\uparrow")
-V_lukpier = Veznik("LUKPIER", lambda x,y:V_ne.izracunaj(x|y),latex="\\downarrow")
-V_ali = Veznik("ALI", lambda x,y:x|y,latex="\\lor",logisim="+")
-V_impl = Veznik("IMPL", lambda x,y:V_ne.izracunaj(x) | y,latex="\\implies")
-V_xor = Veznik("XOR", lambda x,y: x^y,latex="\\oplus")
-V_ekv = Veznik("EKV", lambda x,y: x==y,latex="\\Leftrightarrow")
-
-
-spr_konst_re = [
-	r"x_(?:(?:[a-zA-Z0-9,=_]+)|(?:\{[a-zA-Z0-9,=_]+\}))",
-	r"[01]{1}"
-	]
-
-dvoclenski_simboli = [x.latex.replace("\\","\\\\") for x in [V_ne,V_ter,V_scheff,V_lukpier,V_ali,V_impl,V_xor,V_ekv]]
-splitter_re = [
-*dvoclenski_simboli,
-"[\\{\\(]","[\\})]",
-*spr_konst_re
-]
-SPLITTER_RE = "((?:" + ")|(?:".join(splitter_re) + "))\\s?"
-TOKEN_RE= re.compile(SPLITTER_RE)
-#print(SPLITTER_RE)
-def get_tokens(tekst:str) -> List[str]:
-	m = re.match("("+SPLITTER_RE+")+", tekst)
-	if m:
-		return re.findall(TOKEN_RE,tekst)
-	return []
-
 class SpremenljivaVrednost:
 	def __init__(self, name):
 		self.name = name
@@ -79,7 +56,6 @@ class SpremenljivaVrednost:
 
 	def __str__(self):
 		return f"Spr({self.name})"
-
 
 class DoloceneSpr:
 	def __init__(self, d:dict=None):
@@ -155,7 +131,7 @@ class SpremenljivkaClen(TokenConsumerClen):
 			self.vars.add(sv)
 			return next_i +1
 		raise Exception("Invalid token: "+next_token)
-		
+	
 class DvoClen(TokenConsumerClen):
 	def __init__(self,fn:Veznik,naslednji:TokenConsumerClen):
 		if not fn.latex: raise Exception("No latex matcher: "+str(fn))
@@ -231,17 +207,6 @@ class InClen(TokenConsumerClen):
 		if idx >= len(tokens): return False
 		return self.naslednji.matches(tokens, idx)
 
-SPREMENLJIVKA = SpremenljivkaClen()
-NE = EnoClen(V_ne, None, SPREMENLJIVKA) # EKV later
-IN = InClen(V_ter, NE)
-SCHEFF = DvoClen(V_scheff,IN)
-LUKPIER = DvoClen(V_lukpier,SCHEFF)
-ALI = DvoClen(V_ali,LUKPIER)
-IMPL = DvoClen(V_impl,ALI)
-XOR = DvoClen(V_xor,IMPL)
-IZRAZ = EKV = DvoClen(V_ekv,XOR)
-NE.povratni = EKV # Complete cycle
-
 def eval_postfix(postfix:List[Union[Veznik,int,SpremenljivaVrednost]], za:Optional[DoloceneSpr]=None, stk=None):
 	if stk is None:		
 		stk = []
@@ -281,15 +246,62 @@ def eval_postfix(postfix:List[Union[Veznik,int,SpremenljivaVrednost]], za:Option
 	return [za]
 
 
+### Tokenizing 
+
+V_ne = Veznik("NE", lambda x:1 if x == 0 else 0,latex="\\overline",logisim="~")
+V_ter = Veznik("IN",lambda x,y:x&y,latex="\\land",logisim="*")
+V_scheff = Veznik("SCHEFF", lambda x,y:V_ne.izracunaj(x&y), latex="\\uparrow")
+V_lukpier = Veznik("LUKPIER", lambda x,y:V_ne.izracunaj(x|y),latex="\\downarrow")
+V_ali = Veznik("ALI", lambda x,y:x|y,latex="\\lor",logisim="+")
+V_impl = Veznik("IMPL", lambda x,y:V_ne.izracunaj(x) | y,latex="\\implies")
+V_xor = Veznik("XOR", lambda x,y: x^y,latex="\\oplus")
+V_ekv = Veznik("EKV", lambda x,y: x==y,latex="\\Leftrightarrow")
+
+
+spr_konst_re = [
+	r"x_(?:(?:[a-zA-Z0-9,=_]+)|(?:\{[a-zA-Z0-9,=_]+\}))",
+	r"[01]{1}"
+	]
+
+dvoclenski_simboli = [x.latex.replace("\\","\\\\") for x in [V_ne,V_ter,V_scheff,V_lukpier,V_ali,V_impl,V_xor,V_ekv]]
+splitter_re = [
+	*dvoclenski_simboli,
+	"[\\{\\(]",
+	"[\\})]",
+	*spr_konst_re
+]
+
+SPLITTER_RE = "((?:" + ")|(?:".join(splitter_re) + "))\\s?"
+TOKEN_RE= re.compile(SPLITTER_RE)
+
+
+SPREMENLJIVKA = SpremenljivkaClen()
+NE = EnoClen(V_ne, None, SPREMENLJIVKA) # EKV later
+IN = InClen(V_ter, NE)
+SCHEFF = DvoClen(V_scheff,IN)
+LUKPIER = DvoClen(V_lukpier,SCHEFF)
+ALI = DvoClen(V_ali,LUKPIER)
+IMPL = DvoClen(V_impl,ALI)
+XOR = DvoClen(V_xor,IMPL)
+IZRAZ = EKV = DvoClen(V_ekv,XOR)
+NE.povratni = EKV # Complete cycle
+
 def from_latex(tekst:str, **fn_init_args)->Funkcija:
 	"""
-	tekst: string
-		LaTeX representation of equation, using
-			\\lor, \\land, \\overline, \\downarrow, \\uparrow, \\implies, \\oplus, \\Leftrightarrow
+	Parameters
+	----------
+	tekst : str
+		LaTeX representation of equation, using \\lor, \\land, \\overline,
+		\\downarrow, \\uparrow, \\implies, \\oplus, \\Leftrightarrow
 		Variables following format x_<idx> may be used
-
-	**funkcija_kwargs (Opcijsko)
+	
+	fn_kwargs : dict, optional
 		Argumenti, ki so posredovani v kreacijo objekta funkcije
+	
+	Returns
+	--------
+	fn : Funkcija
+		funkcija, ovrednotena pri različnih vrednostih spremenljivk.
 	"""
 	#print(SPLITTER_RE)
 	print("LaTeX:", tekst)
@@ -309,9 +321,3 @@ def from_latex(tekst:str, **fn_init_args)->Funkcija:
 		biti_ = ''.join([str(v.vrednost) for v in resitve])
 		fn_init_args.update({"spremenljivke":[NoEscape(sv.name) for sv in order]})
 		return Funkcija(biti_, **fn_init_args)
-
-if __name__ == "__main__":
-	#from_latex("\overline{x_1} \overline{x_2} \overline{x_3} \overline{x_4} \lor \overline{x_1} \overline{x_2} \overline{x_3} x_4 \lor \overline{x_1} \overline{x_2} x_3 \overline{x_4} \lor \overline{x_1} \overline{x_2} x_3 x_4 \lor \overline{x_1} x_2 x_3 \overline{x_4} \lor \overline{x_1} x_2 x_3 x_4 \lor x_1 \overline{x_2} \overline{x_3} \overline{x_4} \lor x_1 \overline{x_2} x_3 \overline{x_4} \lor x_1 \overline{x_2} x_3 x_4 \lor x_1 x_2 \overline{x_3} x_4 \lor x_1 x_2 x_3 \overline{x_4} \lor x_1 x_2 x_3 x_4%")
-	#a = from_latex("\overline{x_5} \overline{x_2} \overline{x_3} \overline{x_4} \lor \overline{x_1} \overline{x_2} \overline{x_3} x_4 \lor \overline{x_1} \overline{x_2} x_3 \overline{x_4} \lor \overline{x_1} \overline{x_2} x_3 x_4 \lor \overline{x_1} x_2 x_3 \overline{x_4} \lor \overline{x_1} x_2 x_3 x_4 \lor x_1 \overline{x_2} \overline{x_3} \overline{x_4} \lor x_1 \overline{x_2} x_3 \overline{x_4} \lor x_1 \overline{x_2} x_3 x_4 \lor x_1 x_2 \overline{x_3} x_4 \lor x_1 x_2 x_3 \overline{x_4} \lor x_1 x_2 x_3 x_4")
-	a = from_latex("1 \\lor 0")
-	print(a)

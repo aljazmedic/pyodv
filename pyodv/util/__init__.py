@@ -24,15 +24,17 @@ def fixed(*vars_to_save):
 	finally:
 		pass
 
-def minterm_v_niz(m,n=None):
+def minterm_v_niz(m:int,n:Optional[int]=None) -> str:
 	if n is None:
 		n = np.ceil(np.log2(m)).astype(np.int32)
 	return ("{:0>%d}"%n).format(bin(m)[2:])
 
 
 
-def provide_no_escape(*values):
-	r = [a if isinstance(a, NoEscape) else NoEscape(a) for a in values]
+def provide_no_escape(*values) -> List[NoEscape]:
+	"""Maps non-NoEscape values to NoEscape values.
+	"""
+	r = [(a if isinstance(a, NoEscape) else NoEscape(a)) for a in values]
 	return r
 
 

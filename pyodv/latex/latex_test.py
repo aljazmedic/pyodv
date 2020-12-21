@@ -1,11 +1,8 @@
-from funkcija import Funkcija
-from util import minterm_v_niz
-from tabela import tabela
-from from_latex import from_latex
-from sim_funkcija import SimFunkcija
-from quin import quin
-from popolne_normalne import PDNO, PKNO
-# begin-doc-include
+from ..function import Funkcija, SimFunkcija, from_latex
+from ..util import minterm_v_niz
+from ..latex import tabela, pdno, pkno
+from ..quin import quin
+
 from pylatex import Document, Section, Subsection, Command, Math, Tabular
 from pylatex.basic import NewLine, LineBreak
 from pylatex.utils import italic, NoEscape
@@ -29,11 +26,11 @@ if __name__ == '__main__':
 		d.append(NewLine())
 		d.append(NewLine())
 
-		d.append(PDNO(f2))
+		d.append(pdno(f2))
 		d.append(NewLine())
 		d.append(NewLine())
 
-		d.append(PKNO(f2))
+		d.append(pkno(f2))
 		d.append(NewLine())
 		d.append(NewLine())
 

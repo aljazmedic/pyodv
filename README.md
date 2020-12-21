@@ -66,4 +66,4 @@ f = from_latex("\overline{x_1} \land \overline{x_2})")
 
 ### Uporaba v interpreterju
 
-Pričnemo z ukazom `python -i ODV`, s čimer označimo interaktivni način, kjer bomo lahko uporabljali vse razrede in funkcije modula. (Tudi `IPython -i ODV`)
+Pričnemo z ukazom `python -i pyodv`, s čimer označimo interaktivni način, kjer bomo lahko uporabljali vse razrede in funkcije modula. (Tudi `IPython -i pyodv`)

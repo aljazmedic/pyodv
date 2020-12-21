@@ -1,13 +1,9 @@
-import numpy as np
-from funkcija import Funkcija
-from typing import List,Tuple
-from util import minterm_v_niz, nanesi_bite
-from pylatex import Document, Section, Subsection, Math
+from ..function import Funkcija
+from ..util import minterm_v_niz, nanesi_bite
 from pylatex.utils import NoEscape
-from pprint import PrettyPrinter
-from itertools import zip_longest
 
-pp = PrettyPrinter(indent=4)
+from typing import List,Tuple
+
 
 def _poisci_vsebovalnike(n:int, termi:List[int]):
 	#struktura returna:
@@ -59,7 +55,7 @@ def _neporabljeni_sloji(n_spremenljvk, levels):
 				r[nghbr] = nghtbr_cover[1]
 	return r
 
-def _tex_tabela(n_spremenljvk, levels):
+def _tex_tabela(n_spremenljvk, levels): # TODO: Implement crossing
 	cols = []
 
 	for k, v in levels.items():
@@ -118,7 +114,7 @@ def quin(self:Funkcija) -> Tuple[NoEscape,List[str],Tuple[int,int],Tuple[NoEscap
 	
 	"""
 
-	if self.st_spremenljivk == 0:
+	if self.n == 0:
 		if self.pravilni_biti == "1":		#MDNO,  MKNO
 			mdno_tex = NoEscape(self.tex(fn_index='MDNO')+"=1")
 			mkno_tex = NoEscape(self.tex(fn_index='MKNO')+"=None")
@@ -129,16 +125,13 @@ def quin(self:Funkcija) -> Tuple[NoEscape,List[str],Tuple[int,int],Tuple[NoEscap
 			ret_tex = NoEscape(self.tex(fn_index='MNO')+"=None"+mkno_tex)
 			
 		return ret_tex, [], (0,0), (mdno_tex,mkno_tex)
-	print(self.mintermi)
+	#print(self.mintermi)
 	
-	levels_maks = _poisci_vsebovalnike(self.st_spremenljivk, self.makstermi)
-	levels_min = _poisci_vsebovalnike(self.st_spremenljivk, self.mintermi)
+	levels_maks = _poisci_vsebovalnike(self.n, self.makstermi)
+	levels_min = _poisci_vsebovalnike(self.n, self.mintermi)
 	
-	pp.pprint(levels_min)
-	pp.pprint(levels_maks)
-
-	vseb_min = _neporabljeni_sloji(self.st_spremenljivk, levels_min)
-	vseb_maks = _neporabljeni_sloji(self.st_spremenljivk, levels_maks)
+	vseb_min = _neporabljeni_sloji(self.n, levels_min)
+	vseb_maks = _neporabljeni_sloji(self.n, levels_maks)
 
 
 	#print("MDNO", vseb_min)
@@ -146,15 +139,15 @@ def quin(self:Funkcija) -> Tuple[NoEscape,List[str],Tuple[int,int],Tuple[NoEscap
 	min_max_vseb_maks = _odstrani_nepotrebne(vseb_maks, self.makstermi)
 
 
-	mdno_tex, cena_mdno = nanesi_bite(self.st_spremenljivk, min_max_vseb_min,
+	mdno_tex, cena_mdno = nanesi_bite(self.n, min_max_vseb_min,
 		vrni_ceno=True)
 	
-	mkno_tex, cena_mkno = nanesi_bite(self.st_spremenljivk, min_max_vseb_maks,
+	mkno_tex, cena_mkno = nanesi_bite(self.n, min_max_vseb_maks,
         pn=('0','1'), #Katere se negira, katere ne
         using=('','\lor'), #
         vrni_ceno=True,
         wrap_inner=True)
-	print(cena_mdno, cena_mkno)
+	#print(cena_mdno, cena_mkno)
 	mkno_tex = NoEscape(self.tex(fn_index='MKNO')+"="+mkno_tex)
 	mdno_tex = NoEscape(self.tex(fn_index='MDNO')+"="+mdno_tex)
 
@@ -177,6 +170,7 @@ def str_one_bit_diff( m1:str, m2:str):
 	r[diffs[0]] = "X"
 	return ''.join(r)
 
+__all__ = ["quin"]
 if __name__=="__main__":
 	f = Funkcija("0011110001111100")
 	print(f)
