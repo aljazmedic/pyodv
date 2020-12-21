@@ -282,6 +282,15 @@ def eval_postfix(postfix:List[Union[Veznik,int,SpremenljivaVrednost]], za:Option
 
 
 def from_latex(tekst:str, **fn_init_args)->Funkcija:
+	"""
+	tekst: string
+		LaTeX representation of equation, using
+			\\lor, \\land, \\overline, \\downarrow, \\uparrow, \\implies, \\oplus, \\Leftrightarrow
+		Variables following format x_<idx> may be used
+
+	**funkcija_kwargs (Opcijsko)
+		Argumenti, ki so posredovani v kreacijo objekta funkcije
+	"""
 	#print(SPLITTER_RE)
 	print("LaTeX:", tekst)
 	tokens = get_tokens(tekst)

@@ -27,6 +27,7 @@ def _loci_po(self:Funkcija, zap:int):
 def locitev(self:Funkcija):
     for i in range(self.st_spremenljivk):
         _loci_po(self,i)
+
 if __name__ == "__main__":
     f = Funkcija(mintermi=[0,1,2,3,6,7,8,10,11,13,14,15],n=4)
     print(f)

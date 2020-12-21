@@ -94,7 +94,30 @@ def _odstrani_nepotrebne(vsebovalniki, termi):
 	return veljavne_kombinacije[0]
 	#return vsebovalniki.keys()
 
-def quin(self:Funkcija) -> Tuple[List[str],NoEscape]:
+def quin(self:Funkcija) -> Tuple[NoEscape,List[str],Tuple[int,int],Tuple[NoEscape,NoEscape]]:
+	"""
+	Na funkciji izvede Quinovo metodo
+
+	fn: Funkcija
+		Funkcija, na kateri bo izvedena Quinova metoda.
+	
+
+	Returns
+
+	ret_tex:
+		NoEscape MNO v LaTeX notaciji.
+	
+	vseb_min:
+		List vsebovalnikov. npr: "X10X" -> x_2 ~x_3
+
+	cena_mdno:
+		Tuple (<st_komponent>, <st_povezav>)
+
+	(mdno_tex, mkno_tex):
+		Tuple MDNO in MKNO zapisanih v LaTeX notaciji.
+	
+	"""
+
 	if self.st_spremenljivk == 0:
 		if self.pravilni_biti == "1":		#MDNO,  MKNO
 			mdno_tex = NoEscape(self.tex(fn_index='MDNO')+"=1")

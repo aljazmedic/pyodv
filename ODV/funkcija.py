@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List
-from util import minterm_v_niz
+from util import minterm_v_niz, provide_no_escape
 from pylatex import Document, Section, Subsection, Math
 from pylatex.utils import NoEscape
 import re
@@ -94,10 +94,7 @@ class Funkcija:
 		if not spremenljivke:
 			self.imena_spr = [x(i+1) for i in range(self.n)]
 		else:
-			self.imena_spr =[]
-			for s in spremenljivke[:self.n]:
-				self.imena_spr.append(s if isinstance(s, NoEscape) else NoEscape(s))
-
+			self.imena_spr = provide_no_escape(*spremenljivke[:self.n])
 
 	def __str__(self):
 		inputs = ','.join(self.imena_spr)
@@ -169,6 +166,7 @@ class Funkcija:
 		return NoEscape(self.name+fn_index+NoEscape(f"({inputs})"))
 	
 	def sort(self,order=None):
+
 		o, (fn,) = get_overlapping_inputs(self,inputs=order)
 		pb = ''.join(
 			[fn(self.pravilni_biti, minterm_v_niz(i,n=self.n)) for i in range(2**self.n) ]
@@ -201,10 +199,9 @@ def get_overlapping_inputs(*functions:List[Funkcija], inputs=None):
 			[inputs.add(ime) for ime in f.imena_spr]
 		o = list(sorted(inputs))
 	else:
-		_inp = []
-		for s in inputs:
-			_inp.append(s if isinstance(s, NoEscape) else NoEscape(s))
-		inputs = _inp
+		if not isinstance(inputs, (list,tuple,set)):
+			raise Exception("Invalid inputs:" + str(inputs))
+		inputs = provide_no_escape(inputs)
 		for f in functions:
 			if any([ime not in inputs for ime in f.imena_spr]):
 				raise Exception("Missing some of the names "+str(f.imena_spr))

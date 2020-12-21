@@ -8,6 +8,15 @@ from pprint import PrettyPrinter
 
 
 def PDNO(self:Funkcija,vrni_ceno=False)->NoEscape:
+    """
+    Vrne Popolno disjunktivno normalno obliko funkcije v LaTeX notaciji
+
+    fn:Funkcija
+        Funkcija
+
+    vrni_ceno boolean (Optional)
+        Vrne ceno v obliki (<st_komponent>, <st_povezav>)
+    """
     pdno_tex, cena = nanesi_bite(self.st_spremenljivk,
         termi_maske=self.mintermi,
         pn=('0','1'),
@@ -19,6 +28,15 @@ def PDNO(self:Funkcija,vrni_ceno=False)->NoEscape:
     return pdno_tex
 
 def PKNO(self:Funkcija,vrni_ceno=False)->NoEscape:
+    """
+    Vrne Popolno konjunktivno normalno obliko funkcije v LaTeX notaciji
+
+    fn:Funkcija
+        Funkcija
+
+    vrni_ceno boolean (Optional)
+        Vrne ceno v obliki (<st_komponent>, <st_povezav>)
+    """
     n = self.st_spremenljivk
     pkno_tex, cena =  nanesi_bite(n,
         termi_maske=self.makstermi,

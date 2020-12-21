@@ -31,6 +31,11 @@ def minterm_v_niz(m,n=None):
 
 
 
+def provide_no_escape(*values):
+	r = [a if isinstance(a, NoEscape) else NoEscape(a) for a in values]
+	return r
+
+
 def nanesi_bite(n,nizi:List[str]=None,termi_maske:List[int] = [],pn=('0','1'),using=('\lor',''),wrap_inner=False,vrni_ceno=False) -> [NoEscape, Optional[Tuple[int, int]]]:
 	x = lambda n: NoEscape(f"x_{n}")
 	naredi_neg, ne_naredi_neg = pn

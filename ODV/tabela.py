@@ -6,6 +6,12 @@ from pylatex import Document, Section, Subsection, Math, Tabular
 from pylatex.utils import NoEscape
 
 def tabela(self:Funkcija) -> NoEscape:
+    """
+    Vrni tabelo v LaTeX jeziku
+    
+    fn:Funkcija
+        Funkcija
+    """
     pravilnostna_tabela = Tabular('|'.join('c'*(self.st_spremenljivk+1)))
     pravilnostna_tabela.add_row(list(self.imena_spr)+[self.tex()])
     pravilnostna_tabela.add_hline()
