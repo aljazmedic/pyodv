@@ -4,9 +4,10 @@ from typing import List, Optional
 from pylatex import Document, Section, Subsection, Math
 from pylatex.utils import NoEscape
 from itertools import zip_longest
+from varname import varname
 
 class SimFunkcija(Funkcija):
-	def __init__(self, n:int, sim_stevila:List[int], neg:Optional[List[int]]=None, **kwargs):
+	def __init__(self, n:int, sim_stevila:List[int], neg:Optional[List[int]]=None, name=None,**kwargs):
 		"""
 		Parameters
 		----------
@@ -51,7 +52,9 @@ class SimFunkcija(Funkcija):
 
 			if pravilnostni_vektor_sestevkov[st_bitov]:
 				mtrmi.append(i)
-		kwargs.update({"mintermi":mtrmi})
+		if name is None:
+			name = varname(raise_exc=False) or 'f'
+		kwargs.update({"mintermi":mtrmi,"name":name})
 		#print(kwargs)
 		super(SimFunkcija, self).__init__(**kwargs)
 	

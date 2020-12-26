@@ -1,7 +1,7 @@
 import numpy as np
 from ..util import minterm_v_niz, provide_no_escape
 from pylatex.utils import NoEscape
-
+from varname import varname
 from typing import List, Optional, Union
 
 
@@ -54,7 +54,7 @@ class Funkcija:
 	  1   1 | 0
 	"""
 
-	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None, makstermi:List[int]=None, n=0,spremenljivke=None,name="f"):
+	def __init__(self, pravilni_biti:str=None, mintermi:List[int]=None, makstermi:List[int]=None, n=0,spremenljivke=None,name=None):
 		"""
 		Parameters
 		----------
@@ -135,6 +135,8 @@ class Funkcija:
 				if e == "0":
 					self.makstermi.append(2**self.n-i-1)
 				##Imena, spremenljivke
+		if name is None:
+			name = varname(raise_exc=False) or 'f'
 		self.name=name
 		x = lambda n: NoEscape(f"x_{n}")
 		if not spremenljivke:
@@ -152,10 +154,11 @@ class Funkcija:
 		return self.pravilni_biti == value.pravilni_biti# all([x==y for x, y in zip(self.mintermi, value.mintermi)])
 	
 	def __or__(self,other):
+		name = varname(raise_exc=False) or self.name or "f"
 		if other == 0:
-			return Funkcija(mintermi=self.mintermi.copy(), n=self.n, spremenljivke=self.imena_spr,name=self.name)
+			return Funkcija(mintermi=self.mintermi.copy(), n=self.n, spremenljivke=self.imena_spr,name=name)
 		elif other == 1:
-			return Funkcija(pravilni_biti="1",n=0)
+			return Funkcija(pravilni_biti="1",n=0,name=name)
 		elif type(other) != Funkcija:
 			raise Exception("Not a Function: "+ str(other))
 		spr, (spr_f1, spr_f2) = get_overlapping_inputs(self,other)
@@ -168,16 +171,17 @@ class Funkcija:
 			b_f2 = int(spr_f2(other.pravilni_biti,mtm))
 			p_biti+= "1" if (b_f1==1 or b_f2==1) else "0"
 		#print(p_biti)
-		return Funkcija(p_biti,spremenljivke=spr)
+		return Funkcija(p_biti,spremenljivke=spr,name=name)
 
 	def __add__(self,other):
 		return self.__or__(other)
 
 	def __and__(self, other):
+		name = varname(raise_exc=False) or self.name or "f"
 		if other == 0:
 			return Funkcija(pravilni_biti="0",n=0)
 		elif other == 1:
-			return Funkcija(mintermi=self.mintermi.copy(), n=self.n, spremenljivke=self.imena_spr,name=self.name)
+			return Funkcija(mintermi=self.mintermi.copy(), n=self.n, spremenljivke=self.imena_spr,name=name)
 		elif type(other) != Funkcija:
 			raise Exception("Not a Function: "+ str(other))
 		spr, (spr_f1, spr_f2) = get_overlapping_inputs(self,other)
@@ -190,14 +194,15 @@ class Funkcija:
 			b_f2 = int(spr_f2(other.pravilni_biti, mtm))
 			p_biti+= "1" if (b_f1==1 and b_f2==1) else "0"
 		#print(p_biti)
-		return Funkcija(p_biti,spremenljivke=spr)
+		return Funkcija(p_biti,spremenljivke=spr,name=name)
 
 	def __mul__(self, other):
 		return self.__and__(other)
 
 	def __invert__(self):
+		name = varname(raise_exc=False) or self.name or "f"
 		prav = ''.join(["0" if x == "1" else "1" for x in self.pravilni_biti])
-		return Funkcija(prav,n=self.n,spremenljivke=self.imena_spr,name=self.name)
+		return Funkcija(prav,n=self.n,spremenljivke=self.imena_spr,name=name)
 	
 	def __neg__(self):
 		return self.__invert__()	
@@ -251,15 +256,10 @@ class Funkcija:
 		r = []
 		w = max([len(n) for n in self.imena_spr])
 		headers = ' '.join([("{: <%s}"%w).format(b) for b in self.imena_spr])
-		r.append(" | ".join([headers,self.name]))
+		print(headers,self.name,sep=" | ")
 		for mtrm, vr in enumerate(self.pravilni_biti):
 			niz = minterm_v_niz(mtrm,n=self.n)
-			r.append(
-				" | ".join(
-					[" ".join([("{: >%s}"%w).format(b) for b in niz]),vr]
-					))
-		r = "\n".join(r)
-		return r
+			print(*[" ".join([("{: >%s}"%w).format(b) for b in niz]),vr], sep=" | ")
 
 	@classmethod
 	def table_all(cls, *functions, sort=None):
@@ -269,15 +269,14 @@ class Funkcija:
 		r = []
 		w = max([len(n) for n in spr])
 		headers = ' '.join([("{: <%s}"%w).format(b) for b in spr])
-		r.append(" | ".join([headers,*names]))
+		print(headers,*names, sep=" | ")
 		for mtrm in range(2**n_all_inp):
 			niz = minterm_v_niz(mtrm,n=n_all_inp)
-			r.append(
-				" | ".join(
-					[" ".join([("{: >%s}"%w).format(b) for b in niz]),
+			print(
+					*[" ".join([("{: >%s}"%w).format(b) for b in niz]),
 					*[str(fn_f(f.pravilni_biti, niz)) for fn_f, f in zip(fns, functions)]
-					]
-					))
+					], sep=" | "
+					)
 		r = "\n".join(r)
 		return r
 
